@@ -1,16 +1,18 @@
 "use client"
 
 import { parsePieceNotation } from "@/utils/piece"
-import { Piece, PiecePosition } from "@/types/piece"
+import { Piece } from "@/types/piece"
+import { BoardPosition } from "@/types/board"
 import BoardSquare from "./board-square"
 import BoardCoordinate from "./board-coordinate"
 import HighlightSquare from "./highlight-square"
 import { useBoard } from "@/providers/board-provider"
+import HintSquare from "./hint-square"
 
 const ChessBoard = () => {
-  const { board, perspective, activePiece, setActivePiece, selectPiece, makeMove } = useBoard()
+  const { board, perspective, pseudoLegalMoves, activePiece, setActivePiece, selectPiece, makeMove } = useBoard()
 
-  const handleSquareClick = (piece: Piece | null, position: PiecePosition) => {
+  const handleSquareClick = (piece: Piece | null, position: BoardPosition) => {
     if (!activePiece) {
       if (!piece) return
 
@@ -35,10 +37,10 @@ const ChessBoard = () => {
     e.preventDefault()
   }
 
-  const handleDrop = (e: React.DragEvent, destination: PiecePosition) => {
+  const handleDrop = (e: React.DragEvent, destination: BoardPosition) => {
     e.preventDefault()
 
-    const from: PiecePosition = JSON.parse(e.dataTransfer.getData('application/json'))
+    const from: BoardPosition = JSON.parse(e.dataTransfer.getData('application/json'))
 
     makeMove(destination)
   }
@@ -52,12 +54,12 @@ const ChessBoard = () => {
       {/* Pieces */}
       {board.map((rank, rankIndex) =>
         rank.map((pieceNotation, fileIndex) => {
-          const piecePosition: PiecePosition = {
+          const position: BoardPosition = {
             file: fileIndex + 1,
             rank: 8 - rankIndex
           }
 
-          const piece = pieceNotation ? parsePieceNotation(pieceNotation, piecePosition) : null
+          const piece = pieceNotation ? parsePieceNotation(pieceNotation, position) : null
 
           return (
             <BoardSquare
@@ -67,15 +69,19 @@ const ChessBoard = () => {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               piece={piece}
-              position={piecePosition}
+              position={position}
             />
           )
         })
       )}
 
       {activePiece && (
-        <HighlightSquare position={activePiece.position} perspective={perspective} />
+        <HighlightSquare position={activePiece.position} />
       )}
+
+      {activePiece && pseudoLegalMoves.length > 0 && pseudoLegalMoves.map((move, index) => (
+        <HintSquare key={index} position={move} />
+      ))}
     </div>
   )
 }

@@ -1,25 +1,26 @@
-import { PiecePosition, Piece, PieceColor } from "@/types/piece"
+import { Piece } from "@/types/piece"
+import { BoardPosition } from "@/types/board"
 import ChessPiece from "./piece"
-import { getTranslatedPosition } from "@/utils/board"
+import { getBoardIndex } from "@/utils/board"
 import clsx from "clsx"
 import { useRef, useState } from "react"
 import { useBoard } from "@/providers/board-provider"
 
 type Props = {
   piece: Piece | null
-  position: PiecePosition
-  onClick: (piece: Piece | null, position: PiecePosition) => void
+  position: BoardPosition
+  onClick: (piece: Piece | null, position: BoardPosition) => void
   onDragStart: (e: React.DragEvent, piece: Piece) => void
   onDragOver: (e: React.DragEvent) => void
-  onDrop: (e: React.DragEvent, position: PiecePosition) => void
+  onDrop: (e: React.DragEvent, position: BoardPosition) => void
 }
 
 const BoardSquare = ({ piece, position, onClick, onDragStart, onDragOver, onDrop }: Props) => {
   const { activePiece, perspective } = useBoard()
-  const { file, rank } = getTranslatedPosition(position, perspective)
+  const { fileIndex, rankIndex } = getBoardIndex(position, perspective)
   const imageRef = useRef<HTMLImageElement | null>(null)
-  const translateX = file * 100
-  const translateY = rank * 100
+  const translateX = fileIndex * 100
+  const translateY = rankIndex * 100
   const [droppable, setDroppable] = useState(false)
 
   const handleClick = () => {

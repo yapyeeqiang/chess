@@ -1,11 +1,13 @@
 'use client'
 
 import { createContext, useState, useContext, useCallback, useEffect } from 'react';
-import { Piece, PiecePosition, PieceColor } from '@/types/piece'; // Make sure these types are defined correctly
-import { BoardCastlingRights, BoardMatrix } from '@/types/board';
+import { Piece, PieceColor } from '@/types/piece';
+import { BoardPosition } from "@/types/board"
+import { BoardCastlingRights, BoardMatrix, BoardMove } from '@/types/board';
 import { parseFen, parseFenActiveColor, parseFenCastlingRights, parseFenPlacement } from '@/utils/fen';
 import { FEN_NEW_GAME } from '@/constants/fen';
 import { parsePieceColor } from '@/utils/piece';
+import { getBishopPseudoLegalMoves, getBoardIndex, getKingPseudoLegalMoves, getKnightPseudoLegalMoves, getPawnPseudoLegalMoves, getQueenPseudoLegalMoves, getRookPseudoLegalMoves } from '@/utils/board';
 
 interface BoardContextType {
   board: BoardMatrix;
@@ -22,9 +24,10 @@ interface BoardContextType {
   setFullmove: React.Dispatch<React.SetStateAction<number>>;
   perspective: PieceColor;
   setPerspective: React.Dispatch<React.SetStateAction<PieceColor>>;
+  pseudoLegalMoves: BoardPosition[];
   loadNewGame: () => void;
   selectPiece: (piece: Piece) => void;
-  makeMove: (targetPosition: PiecePosition) => void;
+  makeMove: (targetPosition: BoardPosition) => void;
 }
 
 const BoardContext = createContext<BoardContextType | undefined>(undefined);
@@ -49,9 +52,12 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
     white: { kingside: true, queenside: true },
     black: { kingside: true, queenside: true },
   });
+  const [enPassantTarget, setEnPassantTarget] = useState<BoardPosition | null>(null)
   const [halfmove, setHalfmove] = useState(0)
   const [fullmove, setFullmove] = useState(0)
   const [perspective, setPerspective] = useState<PieceColor>("white")
+  const [moveHistory, setMoveHistory] = useState<BoardMove[]>([])
+  const [pseudoLegalMoves, setPseudoLegalMoves] = useState<BoardPosition[]>([])
 
   const loadNewGame = useCallback(() => {
     const { placement, activeColor, castlingRights, enPassantTarget, halfmove, fullmove } = parseFen(FEN_NEW_GAME)
@@ -72,43 +78,79 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
     const sameSquare = activePiece && activePiece.position.file === piece.position.file && activePiece.position.rank === piece.position.rank
 
     setActivePiece(sameSquare ? null : piece)
-    // TODO: set legal moves
   }
 
   // Move or capture a piece
-  const makeMove = (targetPosition: PiecePosition) => {
+  const makeMove = (targetPosition: BoardPosition) => {
     if (!activePiece) return
 
-    const getBoardIndex = (position: PiecePosition) => ({
-      rank: 8 - position.rank,
-      file: position.file - 1
-    })
-
-    const targetPiecePosition = getBoardIndex(targetPosition)
-    const targetPieceNotation = board[targetPiecePosition.rank][targetPiecePosition.file]
+    const { rankIndex: fromRankIndex, fileIndex: fromFileIndex } = getBoardIndex(activePiece.position)
+    const { rankIndex: toRankIndex, fileIndex: toFileIndex } = getBoardIndex(targetPosition)
+    const targetPieceNotation = board[toRankIndex][toFileIndex]
+    const sameColor = targetPieceNotation && parsePieceColor(targetPieceNotation) === activePiece.color
+    const isPseudoLegalMove = pseudoLegalMoves.some(move => move.file === targetPosition.file && move.rank === targetPosition.rank)
+    const isEnPassantMove = activePiece.name === 'pawn' && enPassantTarget && targetPosition.file === enPassantTarget.file && targetPosition.rank === enPassantTarget.rank
+    console.log({ activePiece, enPassantTarget, targetPosition })
 
     // If the target square is occupied by a piece of the same color, return early
-    if (targetPieceNotation && parsePieceColor(targetPieceNotation) === activePiece.color) {
-      console.log('Cannot move to a square occupied by your own piece!')
+    if (sameColor || !isPseudoLegalMove) {
+      console.log('Illegal move')
       return
     }
 
-    // TODO: check if new position is in legal moves
+    const updatedBoard = [...board]
+    updatedBoard[fromRankIndex][fromFileIndex] = null
+    updatedBoard[toRankIndex][toFileIndex] = activePiece.notation
 
-    const newBoard = [...board]
-    const oldIndex = getBoardIndex(activePiece.position)
-    const newIndex = getBoardIndex(targetPosition)
+    if (isEnPassantMove) {
+      const captureRankIndex = activePiece.color === 'white' ? toRankIndex + 1 : toRankIndex - 1
+      updatedBoard[captureRankIndex][toFileIndex] = null
+    }
 
-    newBoard[oldIndex.rank][oldIndex.file] = null
-    newBoard[newIndex.rank][newIndex.file] = activePiece.notation
+    // after pawn move, check if has en passant target
+    if (activePiece.name === 'pawn') {
+      const fromRank = activePiece.position.rank
+      const toRank = targetPosition.rank
+      const dRank = Math.abs(fromRank - toRank)
 
-    setBoard(newBoard)
+      if (dRank === 2) {
+        setEnPassantTarget({
+          file: activePiece.position.file,
+          rank: (fromRank + toRank) / 2
+        })
+      } else {
+        setEnPassantTarget(null)
+      }
+    } else {
+      setEnPassantTarget(null)
+    }
+
+    setBoard(updatedBoard)
     setActivePiece(null)
   }
 
   useEffect(() => {
     loadNewGame()
   }, [])
+
+  useEffect(() => {
+    if (!activePiece) {
+      setPseudoLegalMoves([])
+      return
+    }
+
+    const moveGenerators: Record<string, () => BoardPosition[]> = {
+      knight: () => getKnightPseudoLegalMoves(board, activePiece),
+      bishop: () => getBishopPseudoLegalMoves(board, activePiece),
+      rook: () => getRookPseudoLegalMoves(board, activePiece),
+      queen: () => getQueenPseudoLegalMoves(board, activePiece),
+      king: () => getKingPseudoLegalMoves(board, activePiece, () => false),
+      pawn: () => getPawnPseudoLegalMoves(board, activePiece, enPassantTarget),
+    }
+
+    const generator = moveGenerators[activePiece.name]
+    setPseudoLegalMoves(generator ? generator() : [])
+  }, [activePiece, enPassantTarget])
 
   return (
     <BoardContext.Provider
@@ -127,6 +169,7 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
         setFullmove,
         perspective,
         setPerspective,
+        pseudoLegalMoves,
         loadNewGame,
         selectPiece,
         makeMove,

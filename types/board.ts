@@ -1,4 +1,4 @@
-import { PieceNotation } from "./piece";
+import { Piece, PieceNotation } from "./piece";
 
 export type BoardMatrix = (PieceNotation | null)[][]
 
@@ -15,4 +15,21 @@ type BoardCastling = {
 export type BoardCastlingRights = {
   white: BoardCastling
   black: BoardCastling
+}
+
+export type BoardPosition = {
+  file: number
+  rank: number
+}
+
+export type BoardMove = {
+  from: BoardPosition
+  to: BoardPosition
+  piece: Piece
+  capturedPiece: Piece
+  promotion: Piece
+  isEnPassant: boolean
+  isCastling: boolean
+  isCheck: boolean
+  isCheckmate: boolean
 }

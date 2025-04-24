@@ -1,5 +1,6 @@
 import { BoardMatrix } from "@/types/board";
-import { Piece, PieceColor, PieceName, PieceNotation, PiecePosition } from "@/types/piece";
+import { Piece, PieceColor, PieceName, PieceNotation } from "@/types/piece";
+import { BoardPosition } from "@/types/board"
 
 const pieceMap: Record<string, PieceName> = {
   p: 'pawn',
@@ -17,21 +18,10 @@ export const parsePieceColor = (pieceNotation: PieceNotation) => {
   return color
 }
 
-export const parsePieceNotation = (pieceNotation: PieceNotation, position: PiecePosition): Piece => {
+export const parsePieceNotation = (pieceNotation: PieceNotation, position: BoardPosition): Piece => {
   const color = parsePieceColor(pieceNotation)
   const key = pieceNotation.toLowerCase()
   const name: PieceName = pieceMap[key]
 
   return { color, name, notation: pieceNotation, position }
-}
-
-export const getPawnLegalMoves = (board: BoardMatrix, piece: Piece) => {
-  const direction = piece.color === 'white' ? 1 : -1
-  const legalMoves: PiecePosition[] = []
-
-  const rank = piece.position.rank
-
-  // position: file -> 4, rank: 1
-  // white: file -> 4, rank: 1
-  // black: file -> 3, rank: 6
 }
