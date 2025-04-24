@@ -1,23 +1,30 @@
+'use client'
+
 import ChessBoard from "@/components/board";
 import PlayerInfo from "@/components/player-info";
+import { useBoard } from "@/providers/board-provider";
 import { Player } from "@/types/player";
 
-const playerA: Player = {
-  name: 'Yap Yee Qiang',
+const whitePlayer: Player = {
+  name: 'Mr. White',
   rating: 1200
 }
 
-const playerB: Player = {
-  name: 'Stephanie Lee',
+const blackPlayer: Player = {
+  name: 'Mr. Black',
   rating: 1200
 }
 
 const Home = () => {
+  const { perspective } = useBoard()
+  const top = perspective === 'white' ? blackPlayer : whitePlayer
+  const bottom = perspective === 'white' ? whitePlayer : blackPlayer
+
   return (
     <div className="p-4 h-screen">
       <div className="mx-4 h-full flex flex-col">
         <div className="ml-8">
-          <PlayerInfo player={playerA} />
+          <PlayerInfo player={top} />
         </div>
 
         <div className="ml-8 my-4 flex-1">
@@ -29,7 +36,7 @@ const Home = () => {
         </div>
 
         <div className="ml-8">
-          <PlayerInfo player={playerB} />
+          <PlayerInfo player={bottom} />
         </div>
       </div>
     </div>

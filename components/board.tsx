@@ -3,9 +3,9 @@
 import { parsePieceNotation } from "@/utils/piece"
 import { Piece, PiecePosition } from "@/types/piece"
 import BoardSquare from "./board-square"
-import { useBoard } from "@/hooks/use-board"
 import BoardCoordinate from "./board-coordinate"
 import HighlightSquare from "./highlight-square"
+import { useBoard } from "@/providers/board-provider"
 
 const ChessBoard = () => {
   const { board, perspective, activePiece, setActivePiece, selectPiece, makeMove } = useBoard()
@@ -28,6 +28,7 @@ const ChessBoard = () => {
   const handleDragStart = (e: React.DragEvent, piece: Piece) => {
     setActivePiece(piece)
     e.dataTransfer.setData('application/json', JSON.stringify(piece.position))
+    e.dataTransfer.effectAllowed = 'move'
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -66,7 +67,6 @@ const ChessBoard = () => {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               piece={piece}
-              perspective={perspective}
               position={piecePosition}
             />
           )

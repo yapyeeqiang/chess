@@ -10,9 +10,15 @@ const pieceMap: Record<string, PieceName> = {
   k: 'king'
 }
 
-export const parsePieceNotation = (pieceNotation: PieceNotation, position: PiecePosition): Piece => {
+export const parsePieceColor = (pieceNotation: PieceNotation) => {
   const code = pieceNotation.charCodeAt(0)
   const color: PieceColor = (code & 0x20) === 0 ? 'white' : 'black'
+
+  return color
+}
+
+export const parsePieceNotation = (pieceNotation: PieceNotation, position: PiecePosition): Piece => {
+  const color = parsePieceColor(pieceNotation)
   const key = pieceNotation.toLowerCase()
   const name: PieceName = pieceMap[key]
 

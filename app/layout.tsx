@@ -1,5 +1,8 @@
+'use state'
+
 import type { Metadata } from "next";
 import "./globals.css";
+import { BoardProvider } from "@/providers/board-provider";
 
 export const metadata: Metadata = {
   title: "Chess Clone",
@@ -14,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <BoardProvider>
+          {children}
+        </BoardProvider>
       </body>
     </html>
   );
