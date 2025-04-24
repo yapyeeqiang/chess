@@ -1,4 +1,4 @@
-import { BoardPosition } from "@/types/board"
+import { BoardPosition } from '@/types/board'
 
 export type PieceColor = 'white' | 'black'
 

@@ -1,9 +1,9 @@
-import { BoardPosition } from "@/types/board"
-import { getBoardIndex } from "@/utils/board";
-import { useBoard } from "@/providers/board-provider";
+import { useBoard } from '@/providers/board-provider'
+import { BoardPosition } from '@/types/board'
+import { getBoardIndex } from '@/utils/board'
 
 type Props = {
-  position: BoardPosition;
+  position: BoardPosition
 }
 
 const HighlightSquare = ({ position }: Props) => {

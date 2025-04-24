@@ -1,4 +1,4 @@
-import { Piece, PieceNotation } from "./piece";
+import { Piece, PieceNotation } from './piece'
 
 export type BoardMatrix = (PieceNotation | null)[][]
 
@@ -8,8 +8,8 @@ export type BoardSquareNotation = {
 }
 
 type BoardCastling = {
-  kingside: boolean;
-  queenside: boolean;
+  kingside: boolean
+  queenside: boolean
 }
 
 export type BoardCastlingRights = {

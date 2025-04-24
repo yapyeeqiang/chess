@@ -1,5 +1,6 @@
-import { Piece } from "@/types/piece"
-import { forwardRef } from "react"
+import { forwardRef } from 'react'
+
+import { Piece } from '@/types/piece'
 
 type Props = {
   piece: Piece

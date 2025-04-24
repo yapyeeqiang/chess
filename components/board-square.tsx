@@ -1,10 +1,12 @@
-import { Piece } from "@/types/piece"
-import { BoardPosition } from "@/types/board"
-import ChessPiece from "./piece"
-import { getBoardIndex } from "@/utils/board"
-import clsx from "clsx"
-import { useRef, useState } from "react"
-import { useBoard } from "@/providers/board-provider"
+import clsx from 'clsx'
+import { useRef, useState } from 'react'
+
+import { useBoard } from '@/providers/board-provider'
+import { BoardPosition } from '@/types/board'
+import { Piece } from '@/types/piece'
+import { getBoardIndex } from '@/utils/board'
+
+import ChessPiece from './piece'
 
 type Props = {
   piece: Piece | null
@@ -15,7 +17,14 @@ type Props = {
   onDrop: (e: React.DragEvent, position: BoardPosition) => void
 }
 
-const BoardSquare = ({ piece, position, onClick, onDragStart, onDragOver, onDrop }: Props) => {
+const BoardSquare = ({
+  piece,
+  position,
+  onClick,
+  onDragStart,
+  onDragOver,
+  onDrop,
+}: Props) => {
   const { activePiece, perspective } = useBoard()
   const { fileIndex, rankIndex } = getBoardIndex(position, perspective)
   const imageRef = useRef<HTMLImageElement | null>(null)
@@ -39,7 +48,11 @@ const BoardSquare = ({ piece, position, onClick, onDragStart, onDragOver, onDrop
 
     if (imageRef.current) {
       const dragImage = imageRef.current
-      e.dataTransfer.setDragImage(dragImage, dragImage.width / 2, dragImage.height / 2)
+      e.dataTransfer.setDragImage(
+        dragImage,
+        dragImage.width / 2,
+        dragImage.height / 2
+      )
     }
   }
 
@@ -73,21 +86,15 @@ const BoardSquare = ({ piece, position, onClick, onDragStart, onDragOver, onDrop
       onDragLeave={handleDragLeave}
       style={{
         transform: `translate3d(${translateX}%, ${translateY}%, 0)`,
-        transition: 'transform 0.2s ease-in-out'
+        transition: 'transform 0.2s ease-in-out',
       }}
-      className={
-        clsx(
-          piece ? 'cursor-grab' : 'cursor-auto',
-          droppable ? 'border-4 border-white' : '',
-          'absolute top-0 left-0 w-[12.5%] h-[12.5%] touch-none overflow-hidden z-20 will-change-transform transition-transform ease-in-out duration-200'
-        )
-      }
-    >
-      {piece ? (
-        <ChessPiece ref={imageRef} piece={piece} />
-      ) : (
-        null
+      className={clsx(
+        piece ? 'cursor-grab' : 'cursor-auto',
+        droppable ? 'border-4 border-white' : '',
+        'absolute top-0 left-0 w-[12.5%] h-[12.5%] touch-none overflow-hidden z-20 will-change-transform transition-transform ease-in-out duration-200'
       )}
+    >
+      {piece ? <ChessPiece ref={imageRef} piece={piece} /> : null}
     </button>
   )
 }

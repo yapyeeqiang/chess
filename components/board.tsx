@@ -1,16 +1,25 @@
-"use client"
+'use client'
 
-import { parsePieceNotation } from "@/utils/piece"
-import { Piece } from "@/types/piece"
-import { BoardPosition } from "@/types/board"
-import BoardSquare from "./board-square"
-import BoardCoordinate from "./board-coordinate"
-import HighlightSquare from "./highlight-square"
-import { useBoard } from "@/providers/board-provider"
-import HintSquare from "./hint-square"
+import { useBoard } from '@/providers/board-provider'
+import { BoardPosition } from '@/types/board'
+import { Piece } from '@/types/piece'
+import { parsePieceNotation } from '@/utils/piece'
+
+import BoardCoordinate from './board-coordinate'
+import BoardSquare from './board-square'
+import HighlightSquare from './highlight-square'
+import HintSquare from './hint-square'
 
 const ChessBoard = () => {
-  const { board, perspective, pseudoLegalMoves, activePiece, setActivePiece, selectPiece, makeMove } = useBoard()
+  const {
+    board,
+    perspective,
+    pseudoLegalMoves,
+    activePiece,
+    setActivePiece,
+    selectPiece,
+    makeMove,
+  } = useBoard()
 
   const handleSquareClick = (piece: Piece | null, position: BoardPosition) => {
     if (!activePiece) {
@@ -40,14 +49,19 @@ const ChessBoard = () => {
   const handleDrop = (e: React.DragEvent, destination: BoardPosition) => {
     e.preventDefault()
 
-    const from: BoardPosition = JSON.parse(e.dataTransfer.getData('application/json'))
+    const from: BoardPosition = JSON.parse(
+      e.dataTransfer.getData('application/json')
+    )
 
     makeMove(destination)
   }
 
   return (
     <div className="relative">
-      <img src="/chess-board.png" className="h-full w-full aspect-square rounded" />
+      <img
+        src="/chess-board.png"
+        className="h-full w-full aspect-square rounded"
+      />
 
       <BoardCoordinate perspective={perspective} />
 
@@ -56,10 +70,12 @@ const ChessBoard = () => {
         rank.map((pieceNotation, fileIndex) => {
           const position: BoardPosition = {
             file: fileIndex + 1,
-            rank: 8 - rankIndex
+            rank: 8 - rankIndex,
           }
 
-          const piece = pieceNotation ? parsePieceNotation(pieceNotation, position) : null
+          const piece = pieceNotation
+            ? parsePieceNotation(pieceNotation, position)
+            : null
 
           return (
             <BoardSquare
@@ -75,13 +91,13 @@ const ChessBoard = () => {
         })
       )}
 
-      {activePiece && (
-        <HighlightSquare position={activePiece.position} />
-      )}
+      {activePiece && <HighlightSquare position={activePiece.position} />}
 
-      {activePiece && pseudoLegalMoves.length > 0 && pseudoLegalMoves.map((move, index) => (
-        <HintSquare key={index} position={move} />
-      ))}
+      {activePiece &&
+        pseudoLegalMoves.length > 0 &&
+        pseudoLegalMoves.map((move, index) => (
+          <HintSquare key={index} position={move} />
+        ))}
     </div>
   )
 }

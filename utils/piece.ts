@@ -1,6 +1,5 @@
-import { BoardMatrix } from "@/types/board";
-import { Piece, PieceColor, PieceName, PieceNotation } from "@/types/piece";
-import { BoardPosition } from "@/types/board"
+import { BoardPosition } from '@/types/board'
+import { Piece, PieceColor, PieceName, PieceNotation } from '@/types/piece'
 
 const pieceMap: Record<string, PieceName> = {
   p: 'pawn',
@@ -8,7 +7,7 @@ const pieceMap: Record<string, PieceName> = {
   b: 'bishop',
   r: 'rook',
   q: 'queen',
-  k: 'king'
+  k: 'king',
 }
 
 export const parsePieceColor = (pieceNotation: PieceNotation) => {
@@ -18,7 +17,10 @@ export const parsePieceColor = (pieceNotation: PieceNotation) => {
   return color
 }
 
-export const parsePieceNotation = (pieceNotation: PieceNotation, position: BoardPosition): Piece => {
+export const parsePieceNotation = (
+  pieceNotation: PieceNotation,
+  position: BoardPosition
+): Piece => {
   const color = parsePieceColor(pieceNotation)
   const key = pieceNotation.toLowerCase()
   const name: PieceName = pieceMap[key]

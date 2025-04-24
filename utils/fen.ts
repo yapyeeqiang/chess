@@ -1,11 +1,25 @@
-import { BoardCastlingRights, BoardMatrix } from "@/types/board"
-import { PieceColor, PieceNotation } from "@/types/piece"
+import { BoardCastlingRights, BoardMatrix } from '@/types/board'
+import { PieceColor, PieceNotation } from '@/types/piece'
 
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 export const parseFen = (fen: string) => {
-  const [placement, activeColor, castlingRights, enPassantTarget, halfmove, fullmove] = fen.split(" ")
+  const [
+    placement,
+    activeColor,
+    castlingRights,
+    enPassantTarget,
+    halfmove,
+    fullmove,
+  ] = fen.split(' ')
 
-  return { placement, activeColor: activeColor as 'w' | 'b', castlingRights, enPassantTarget, halfmove, fullmove }
+  return {
+    placement,
+    activeColor: activeColor as 'w' | 'b',
+    castlingRights,
+    enPassantTarget,
+    halfmove,
+    fullmove,
+  }
 }
 
 export const parseFenPlacement = (fenPlacement: string) => {
@@ -38,15 +52,17 @@ export const parseFenActiveColor = (fenActiveColor: 'w' | 'b'): PieceColor => {
   return 'black'
 }
 
-export const parseFenCastlingRights = (fenCastlingRights: string): BoardCastlingRights => {
+export const parseFenCastlingRights = (
+  fenCastlingRights: string
+): BoardCastlingRights => {
   return {
     white: {
-      kingside: fenCastlingRights.includes("K"),
-      queenside: fenCastlingRights.includes("Q"),
+      kingside: fenCastlingRights.includes('K'),
+      queenside: fenCastlingRights.includes('Q'),
     },
     black: {
-      kingside: fenCastlingRights.includes("k"),
-      queenside: fenCastlingRights.includes("q"),
+      kingside: fenCastlingRights.includes('k'),
+      queenside: fenCastlingRights.includes('q'),
     },
   }
 }

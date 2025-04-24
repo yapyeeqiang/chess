@@ -1,9 +1,9 @@
 'use client'
 
-import ChessBoard from "@/components/board";
-import PlayerInfo from "@/components/player-info";
-import { useBoard } from "@/providers/board-provider";
-import { Player } from "@/types/player";
+import ChessBoard from '@/components/board';
+import PlayerInfo from '@/components/player-info';
+import { useBoard } from '@/providers/board-provider';
+import { Player } from '@/types/player';
 
 const whitePlayer: Player = {
   name: 'Mr. White',
