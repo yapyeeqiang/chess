@@ -17,11 +17,6 @@ body {
     color: var(--foreground);
 }
 
-/* coordinates */
-.coordinates {
-    user-select: none;
-}
-
 .highlight {
     position: absolute;
     top: 0;

@@ -2,31 +2,27 @@ import clsx from 'clsx'
 import { useRef, useState } from 'react'
 
 import { useBoard } from '@/providers/board-provider'
-import { BoardPosition } from '@/types/board'
-import { Piece } from '@/types/piece'
-import { getBoardIndex } from '@/utils/board'
-
-import ChessPiece from './piece'
+import { BoardIndex, BoardPosition } from '@/types/board'
+import { Piece, PieceNotation } from '@/types/piece'
+import { getBoardIndex, getBoardPosition } from '@/utils/board'
+import BoardPiece from './board-piece'
+import { parsePieceNotation } from '@/utils/piece'
 
 type Props = {
-  piece: Piece | null
-  position: BoardPosition
+  pieceNotation: PieceNotation | null
+  boardIndex: BoardIndex
   onClick: (piece: Piece | null, position: BoardPosition) => void
-  onDragStart: (e: React.DragEvent, piece: Piece) => void
-  onDragOver: (e: React.DragEvent) => void
-  onDrop: (e: React.DragEvent, position: BoardPosition) => void
 }
 
 const BoardSquare = ({
-  piece,
-  position,
+  pieceNotation,
+  boardIndex,
   onClick,
-  onDragStart,
-  onDragOver,
-  onDrop,
 }: Props) => {
-  const { activePiece, perspective } = useBoard()
-  const { fileIndex, rankIndex } = getBoardIndex(position, perspective)
+  const { activePiece, activeColor, setActivePiece, perspective, makeMove } = useBoard()
+  const { fileIndex, rankIndex } = boardIndex
+  const boardPosition = getBoardPosition(boardIndex, perspective)
+  const piece = pieceNotation ? parsePieceNotation(pieceNotation, boardPosition) : null
   const imageRef = useRef<HTMLImageElement | null>(null)
   const translateX = fileIndex * 100
   const translateY = rankIndex * 100
@@ -34,17 +30,20 @@ const BoardSquare = ({
 
   const handleClick = () => {
     if (!piece) {
-      onClick(null, position)
+      onClick(null, boardPosition)
       return
     }
 
-    onClick(piece, position)
+    onClick(piece, boardPosition)
   }
 
   const handleDragStart = (e: React.DragEvent) => {
-    if (!piece) return
+    e.dataTransfer.effectAllowed = 'move'
 
-    onDragStart(e, piece)
+    if (!piece) return
+    if (piece.color !== activeColor) return
+
+    setActivePiece(piece)
 
     if (imageRef.current) {
       const dragImage = imageRef.current
@@ -64,6 +63,10 @@ const BoardSquare = ({
     }
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault()
 
@@ -71,7 +74,9 @@ const BoardSquare = ({
   }
 
   const handleDrop = (e: React.DragEvent) => {
-    onDrop(e, position)
+    e.preventDefault()
+
+    makeMove(boardPosition)
 
     setDroppable(false)
   }
@@ -81,7 +86,7 @@ const BoardSquare = ({
       onClick={handleClick}
       onDragStart={handleDragStart}
       onDrop={handleDrop}
-      onDragOver={onDragOver}
+      onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       style={{
@@ -94,7 +99,7 @@ const BoardSquare = ({
         'absolute top-0 left-0 w-[12.5%] h-[12.5%] touch-none overflow-hidden z-20 will-change-transform transition-transform ease-in-out duration-200'
       )}
     >
-      {piece ? <ChessPiece ref={imageRef} piece={piece} /> : null}
+      {piece ? <BoardPiece ref={imageRef} piece={piece} /> : null}
     </button>
   )
 }

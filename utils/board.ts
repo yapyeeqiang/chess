@@ -1,4 +1,4 @@
-import { BoardCastlingRights, BoardMatrix, BoardPosition } from '@/types/board'
+import { BoardCastlingRights, BoardIndex, BoardMatrix, BoardPosition } from '@/types/board'
 import { Piece, PieceColor } from '@/types/piece'
 
 import { parsePieceColor, parsePieceNotation } from './piece'
@@ -16,8 +16,7 @@ export const getBoardIndex = (
 }
 
 export const getBoardPosition = (
-  fileIndex: number,
-  rankIndex: number,
+  { fileIndex, rankIndex }: BoardIndex,
   perspective: PieceColor = 'white'
 ): BoardPosition => {
   const file = perspective === 'white' ? fileIndex + 1 : 8 - fileIndex
@@ -50,7 +49,7 @@ export const getKingPosition = (
     for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
       const piece = board[rankIndex][fileIndex]
       if (piece?.toLowerCase() === 'k' && parsePieceColor(piece) === color) {
-        return getBoardPosition(fileIndex, rankIndex)
+        return getBoardPosition({ fileIndex, rankIndex })
       }
     }
   }
@@ -68,14 +67,13 @@ export const isBoardSquareSafe = (
   position: BoardPosition,
   attackerColor: PieceColor,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ): boolean => {
   const opponentColor = attackerColor === 'white' ? 'black' : 'white'
 
   for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
     for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
       const pieceNotation = board[rankIndex][fileIndex]
-      const { file, rank } = getBoardPosition(fileIndex, rankIndex)
+      const { file, rank } = getBoardPosition({ fileIndex, rankIndex })
 
       if (pieceNotation && parsePieceColor(pieceNotation) === opponentColor) {
         const piece = parsePieceNotation(pieceNotation, { file, rank })
@@ -98,7 +96,7 @@ export const isBoardSquareSafe = (
             legalMoves = getQueenPseudoLegalMoves(board, piece)
             break
           case 'king':
-            legalMoves = getKingPseudoLegalMoves(board, piece, castlingRights)
+            legalMoves = getKingPseudoLegalMoves(board, piece)
             break
         }
 
@@ -120,7 +118,6 @@ export const isCheck = (
   board: BoardMatrix,
   color: PieceColor,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ): boolean => {
   const kingPosition = getKingPosition(board, color)
   if (!kingPosition) return false
@@ -130,7 +127,6 @@ export const isCheck = (
     kingPosition,
     color,
     enPassantTarget,
-    castlingRights
   )
 }
 
@@ -140,7 +136,7 @@ export const isCheckmate = (
   enPassantTarget: BoardPosition | null,
   castlingRights: BoardCastlingRights
 ): boolean => {
-  if (!isCheck(board, color, enPassantTarget, castlingRights)) return false
+  if (!isCheck(board, color, enPassantTarget)) return false
 
   // Loop through all pieces of color
   for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
@@ -148,34 +144,29 @@ export const isCheckmate = (
       const pieceNotation = board[rankIndex][fileIndex]
       if (!pieceNotation || parsePieceColor(pieceNotation) !== color) continue
 
-      const position = getBoardPosition(fileIndex, rankIndex)
+      const position = getBoardPosition({ fileIndex, rankIndex })
       const piece = parsePieceNotation(pieceNotation, position)
 
       let legalMoves: BoardPosition[] = []
 
       switch (piece.name) {
         case 'pawn':
-          legalMoves = getPawnPseudoLegalMoves(board, piece, enPassantTarget)
+          legalMoves = getPawnLegalMoves(board, piece, enPassantTarget)
           break
         case 'knight':
-          legalMoves = getKnightPseudoLegalMoves(board, piece)
+          legalMoves = getKnightLegalMoves(board, piece, enPassantTarget)
           break
         case 'bishop':
-          legalMoves = getBishopPseudoLegalMoves(board, piece)
+          legalMoves = getBishopLegalMoves(board, piece, enPassantTarget)
           break
         case 'rook':
-          legalMoves = getRookPseudoLegalMoves(board, piece)
+          legalMoves = getRookLegalMoves(board, piece, enPassantTarget)
           break
         case 'queen':
-          legalMoves = getQueenPseudoLegalMoves(board, piece)
+          legalMoves = getQueenLegalMoves(board, piece, enPassantTarget)
           break
         case 'king':
-          legalMoves = getKingLegalMoves(
-            board,
-            piece,
-            enPassantTarget,
-            castlingRights
-          )
+          legalMoves = getKingLegalMoves(board, piece, enPassantTarget, castlingRights)
           break
       }
 
@@ -192,41 +183,36 @@ export const isStalemate = (
   enPassantTarget: BoardPosition | null,
   castlingRights: BoardCastlingRights
 ): boolean => {
-  if (isCheck(board, color, enPassantTarget, castlingRights)) return false
+  if (isCheck(board, color, enPassantTarget)) return false
 
   for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
     for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
       const pieceNotation = board[rankIndex][fileIndex]
       if (!pieceNotation || parsePieceColor(pieceNotation) !== color) continue
 
-      const position = getBoardPosition(fileIndex, rankIndex)
+      const position = getBoardPosition({ fileIndex, rankIndex })
       const piece = parsePieceNotation(pieceNotation, position)
 
       let legalMoves: BoardPosition[] = []
 
       switch (piece.name) {
         case 'pawn':
-          legalMoves = getPawnPseudoLegalMoves(board, piece, enPassantTarget)
+          legalMoves = getPawnLegalMoves(board, piece, enPassantTarget)
           break
         case 'knight':
-          legalMoves = getKnightPseudoLegalMoves(board, piece)
+          legalMoves = getKnightLegalMoves(board, piece, enPassantTarget)
           break
         case 'bishop':
-          legalMoves = getBishopPseudoLegalMoves(board, piece)
+          legalMoves = getBishopLegalMoves(board, piece, enPassantTarget)
           break
         case 'rook':
-          legalMoves = getRookPseudoLegalMoves(board, piece)
+          legalMoves = getRookLegalMoves(board, piece, enPassantTarget)
           break
         case 'queen':
-          legalMoves = getQueenPseudoLegalMoves(board, piece)
+          legalMoves = getQueenLegalMoves(board, piece, enPassantTarget)
           break
         case 'king':
-          legalMoves = getKingLegalMoves(
-            board,
-            piece,
-            enPassantTarget,
-            castlingRights
-          )
+          legalMoves = getKingLegalMoves(board, piece, enPassantTarget, castlingRights)
           break
       }
 
@@ -256,7 +242,7 @@ export const getSlidingPiecePseudoLegalMoves = (
 
     while (isInBounds(newFileIndex, newRankIndex)) {
       const targetPieceNotation = board[newRankIndex][newFileIndex]
-      const { file, rank } = getBoardPosition(newFileIndex, newRankIndex)
+      const { file, rank } = getBoardPosition({ fileIndex: newFileIndex, rankIndex: newRankIndex })
 
       if (!targetPieceNotation) {
         legalMoves.push({ file, rank })
@@ -306,7 +292,7 @@ export const getKnightPseudoLegalMoves = (board: BoardMatrix, piece: Piece) => {
         !targetPieceNotation ||
         sourcePieceColor !== parsePieceColor(targetPieceNotation)
       ) {
-        const { file, rank } = getBoardPosition(newFileIndex, newRankIndex)
+        const { file, rank } = getBoardPosition({ fileIndex: newFileIndex, rankIndex: newRankIndex })
         legalMoves.push({ file, rank })
       }
     }
@@ -319,7 +305,6 @@ export const getKnightLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ) => {
   const pseudoMoves = getKnightPseudoLegalMoves(board, piece)
 
@@ -329,7 +314,6 @@ export const getKnightLegalMoves = (
       boardAfterMove,
       piece.color,
       enPassantTarget,
-      castlingRights
     )
   })
 }
@@ -346,7 +330,6 @@ export const getBishopLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ) => {
   const pseudoMoves = getBishopPseudoLegalMoves(board, piece)
 
@@ -355,8 +338,7 @@ export const getBishopLegalMoves = (
     return !isCheck(
       boardAfterMove,
       piece.color,
-      enPassantTarget,
-      castlingRights
+      enPassantTarget
     )
   })
 }
@@ -373,7 +355,6 @@ export const getRookLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ) => {
   const pseudoMoves = getRookPseudoLegalMoves(board, piece)
 
@@ -383,7 +364,6 @@ export const getRookLegalMoves = (
       boardAfterMove,
       piece.color,
       enPassantTarget,
-      castlingRights
     )
   })
 }
@@ -404,7 +384,6 @@ export const getQueenLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ) => {
   const pseudoMoves = getQueenPseudoLegalMoves(board, piece)
 
@@ -414,7 +393,6 @@ export const getQueenLegalMoves = (
       boardAfterMove,
       piece.color,
       enPassantTarget,
-      castlingRights
     )
   })
 }
@@ -422,7 +400,6 @@ export const getQueenLegalMoves = (
 export const getKingPseudoLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
-  castlingRights: BoardCastlingRights
 ) => {
   const { fileIndex, rankIndex } = getBoardIndex(piece.position)
   const sourcePieceNotation = board[rankIndex][fileIndex]
@@ -447,7 +424,7 @@ export const getKingPseudoLegalMoves = (
   for (const [df, dr] of directions) {
     const newFileIndex = fileIndex + df
     const newRankIndex = rankIndex + dr
-    const { file, rank } = getBoardPosition(newFileIndex, newRankIndex)
+    const { file, rank } = getBoardPosition({ fileIndex: newFileIndex, rankIndex: newRankIndex })
 
     if (!isInBounds(newFileIndex, newRankIndex)) continue
     const targetPieceNotation = board[newRankIndex][newFileIndex]
@@ -469,16 +446,11 @@ export const getKingLegalMoves = (
   enPassantTarget: BoardPosition | null,
   castlingRights: BoardCastlingRights
 ) => {
-  const pseudoMoves = getKingPseudoLegalMoves(board, piece, castlingRights)
+  const pseudoMoves = getKingPseudoLegalMoves(board, piece)
   const color = piece.color
-  const legalMoves = pseudoMoves.filter((move) => {
-    return isBoardSquareSafe(
-      board,
-      move,
-      color,
-      enPassantTarget,
-      castlingRights
-    )
+  const legalMoves = pseudoMoves.filter((move) => isBoardSquareSafe(board, move, color, enPassantTarget)).filter(move => {
+    const boardAfterMove = getBoardAfterMove(board, piece.position, move)
+    return !isCheck(boardAfterMove, color, enPassantTarget)
   })
 
   // castling check
@@ -491,20 +463,19 @@ export const getKingLegalMoves = (
       piece.position,
       color,
       enPassantTarget,
-      castlingRights
     )
   ) {
     if (kingside) {
       const F_FILE_INDEX = fileIndex + 1
       const G_FILE_INDEX = fileIndex + 2
-      const f1 = getBoardPosition(F_FILE_INDEX, rankIndex)
-      const g1 = getBoardPosition(G_FILE_INDEX, rankIndex)
+      const f1 = getBoardPosition({ fileIndex: F_FILE_INDEX, rankIndex })
+      const g1 = getBoardPosition({ fileIndex: G_FILE_INDEX, rankIndex })
 
       const isClear =
         !board[rankIndex][F_FILE_INDEX] && !board[rankIndex][G_FILE_INDEX]
       const isSafe =
-        isBoardSquareSafe(board, f1, color, enPassantTarget, castlingRights) &&
-        isBoardSquareSafe(board, g1, color, enPassantTarget, castlingRights)
+        isBoardSquareSafe(board, f1, color, enPassantTarget) &&
+        isBoardSquareSafe(board, g1, color, enPassantTarget)
 
       if (isClear && isSafe) {
         legalMoves.push(g1)
@@ -515,16 +486,16 @@ export const getKingLegalMoves = (
       const B_FILE_INDEX = fileIndex - 3
       const C_FILE_INDEX = fileIndex - 2
       const D_FILE_INDEX = fileIndex - 1
-      const c1 = getBoardPosition(C_FILE_INDEX, rankIndex)
-      const d1 = getBoardPosition(D_FILE_INDEX, rankIndex)
+      const c1 = getBoardPosition({ fileIndex: C_FILE_INDEX, rankIndex })
+      const d1 = getBoardPosition({ fileIndex: D_FILE_INDEX, rankIndex })
 
       const isClear =
         !board[rankIndex][D_FILE_INDEX] &&
         !board[rankIndex][C_FILE_INDEX] &&
         !board[rankIndex][B_FILE_INDEX]
       const isSafe =
-        isBoardSquareSafe(board, c1, color, enPassantTarget, castlingRights) &&
-        isBoardSquareSafe(board, d1, color, enPassantTarget, castlingRights)
+        isBoardSquareSafe(board, c1, color, enPassantTarget) &&
+        isBoardSquareSafe(board, d1, color, enPassantTarget)
 
       if (isClear && isSafe) {
         legalMoves.push(c1)
@@ -547,14 +518,14 @@ export const getPawnPseudoLegalMoves = (
 
   // 1 step forward
   if (!board[rankIndex + direction]?.[fileIndex]) {
-    legalMoves.push(getBoardPosition(fileIndex, rankIndex + direction))
+    legalMoves.push(getBoardPosition({ fileIndex, rankIndex: rankIndex + direction }))
 
     // 2 steps forward from starting rank
     if (
       rankIndex === startRankIndex &&
       !board[rankIndex + 2 * direction]?.[fileIndex]
     ) {
-      legalMoves.push(getBoardPosition(fileIndex, rankIndex + 2 * direction))
+      legalMoves.push(getBoardPosition({ fileIndex, rankIndex: rankIndex + 2 * direction }))
     }
   }
 
@@ -569,7 +540,7 @@ export const getPawnPseudoLegalMoves = (
     const targetPieceColor = targetPieceNotation
       ? parsePieceColor(targetPieceNotation)
       : null
-    const { file, rank } = getBoardPosition(newFileIndex, newRankIndex)
+    const { file, rank } = getBoardPosition({ fileIndex: newFileIndex, rankIndex: newRankIndex })
 
     if (targetPieceNotation && targetPieceColor !== piece.color) {
       legalMoves.push({ file, rank })
@@ -589,7 +560,6 @@ export const getPawnLegalMoves = (
   board: BoardMatrix,
   piece: Piece,
   enPassantTarget: BoardPosition | null,
-  castlingRights: BoardCastlingRights
 ) => {
   const pseudoMoves = getPawnPseudoLegalMoves(board, piece, enPassantTarget)
 
@@ -599,7 +569,6 @@ export const getPawnLegalMoves = (
       boardAfterMove,
       piece.color,
       enPassantTarget,
-      castlingRights
     )
   })
 }

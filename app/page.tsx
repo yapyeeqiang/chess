@@ -1,6 +1,6 @@
 'use client'
 
-import ChessBoard from '@/components/board';
+import Game from '@/components/game';
 import PlayerInfo from '@/components/player-info';
 import { useBoard } from '@/providers/board-provider';
 import { Player } from '@/types/player';
@@ -30,7 +30,7 @@ const Home = () => {
         <div className="ml-8 my-4 flex-1">
           <div className="h-full w-full relative">
             <div className="absolute h-full aspect-square">
-              <ChessBoard />
+              <Game />
             </div>
           </div>
         </div>

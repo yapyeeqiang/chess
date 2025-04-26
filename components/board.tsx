@@ -1,105 +1,37 @@
-'use client'
+import { useBoard } from "@/providers/board-provider"
+import clsx from "clsx"
 
-import { useBoard } from '@/providers/board-provider'
-import { BoardPosition } from '@/types/board'
-import { Piece } from '@/types/piece'
-import { parsePieceNotation } from '@/utils/piece'
+type Props = {} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 
-import BoardCoordinate from './board-coordinate'
-import BoardSquare from './board-square'
-import HighlightSquare from './highlight-square'
-import HintSquare from './hint-square'
-
-const ChessBoard = () => {
-  const {
-    board,
-    perspective,
-    pseudoLegalMoves,
-    activePiece,
-    setActivePiece,
-    selectPiece,
-    makeMove,
-  } = useBoard()
-
-  const handleSquareClick = (piece: Piece | null, position: BoardPosition) => {
-    if (!activePiece) {
-      if (!piece) return
-
-      // select a piece
-      return selectPiece({ ...piece, position })
-    }
-
-    // move or capture
-    if (!piece || piece.color !== activePiece.color) return makeMove(position)
-
-    // deselect
-    return selectPiece({ ...piece, position })
-  }
-
-  const handleDragStart = (e: React.DragEvent, piece: Piece) => {
-    setActivePiece(piece)
-    e.dataTransfer.setData('application/json', JSON.stringify(piece.position))
-    e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-  }
-
-  const handleDrop = (e: React.DragEvent, destination: BoardPosition) => {
-    e.preventDefault()
-
-    const from: BoardPosition = JSON.parse(
-      e.dataTransfer.getData('application/json')
-    )
-
-    makeMove(destination)
-  }
+const Board = ({ ...props }: Props) => {
+  const { board } = useBoard()
 
   return (
-    <div className="relative">
-      <img
-        src="/chess-board.png"
-        className="h-full w-full aspect-square rounded"
-      />
-
-      <BoardCoordinate perspective={perspective} />
-
-      {/* Pieces */}
+    <div {...props}>
       {board.map((rank, rankIndex) =>
-        rank.map((pieceNotation, fileIndex) => {
-          const position: BoardPosition = {
-            file: fileIndex + 1,
-            rank: 8 - rankIndex,
-          }
-
-          const piece = pieceNotation
-            ? parsePieceNotation(pieceNotation, position)
-            : null
+        rank.map((_, fileIndex) => {
+          const translateX = fileIndex * 100
+          const translateY = rankIndex * 100
 
           return (
-            <BoardSquare
+            <div
               key={`${rankIndex}-${fileIndex}`}
-              onClick={handleSquareClick}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              piece={piece}
-              position={position}
+              style={{
+                transform: `translate3d(${translateX}%, ${translateY}%, 0)`,
+                transition: 'transform 0.2s ease-in-out',
+              }}
+              className={
+                clsx(
+                  (fileIndex + rankIndex) % 2 === 0 ? 'bg-[#edd6b0]' : 'bg-[#b98761]',
+                  'absolute top-0 left-0 w-[12.5%] h-[12.5%] touch-none overflow-hidden will-change-transform transition-transform ease-in-out duration-200'
+                )
+              }
             />
           )
         })
       )}
-
-      {activePiece && <HighlightSquare position={activePiece.position} />}
-
-      {activePiece &&
-        pseudoLegalMoves.length > 0 &&
-        pseudoLegalMoves.map((move, index) => (
-          <HintSquare key={index} position={move} />
-        ))}
     </div>
   )
 }
 
-export default ChessBoard
+export default Board

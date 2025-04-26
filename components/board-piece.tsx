@@ -6,7 +6,7 @@ type Props = {
   piece: Piece
 }
 
-const ChessPiece = forwardRef<HTMLImageElement, Props>(({ piece }, ref) => {
+const BoardPiece = forwardRef<HTMLImageElement, Props>(({ piece }, ref) => {
   const { name, color } = piece
 
   return (
@@ -19,4 +19,4 @@ const ChessPiece = forwardRef<HTMLImageElement, Props>(({ piece }, ref) => {
   )
 })
 
-export default ChessPiece
+export default BoardPiece

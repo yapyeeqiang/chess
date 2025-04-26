@@ -52,6 +52,7 @@ interface BoardContextType {
   loadNewGame: () => void
   selectPiece: (piece: Piece) => void
   makeMove: (targetPosition: BoardPosition) => void
+  handleSquareClick: (piece: Piece | null, position: BoardPosition) => void
 }
 
 const BoardContext = createContext<BoardContextType | undefined>(undefined)
@@ -213,6 +214,21 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
     setActiveColor((prev) => (prev === 'white' ? 'black' : 'white'))
   }
 
+  const handleSquareClick = (piece: Piece | null, position: BoardPosition) => {
+    if (!activePiece) {
+      if (!piece) return
+
+      // select a piece
+      return selectPiece({ ...piece, position })
+    }
+
+    // move or capture
+    if (!piece || piece.color !== activePiece.color) return makeMove(position)
+
+    // deselect
+    return selectPiece({ ...piece, position })
+  }
+
   useEffect(() => {
     loadNewGame()
   }, [])
@@ -273,6 +289,7 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
         loadNewGame,
         selectPiece,
         makeMove,
+        handleSquareClick,
       }}
     >
       {children}

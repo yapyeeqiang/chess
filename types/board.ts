@@ -17,6 +17,11 @@ export type BoardCastlingRights = {
   black: BoardCastling
 }
 
+export type BoardIndex = {
+  fileIndex: number
+  rankIndex: number
+}
+
 export type BoardPosition = {
   file: number
   rank: number
