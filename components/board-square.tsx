@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { useBoard } from '@/providers/board-provider'
 import { BoardIndex, BoardPosition } from '@/types/board'
 import { Piece, PieceNotation } from '@/types/piece'
-import { getBoardIndex, getBoardPosition } from '@/utils/board'
+import { getBoardPosition } from '@/utils/board'
 import BoardPiece from './board-piece'
 import { parsePieceNotation } from '@/utils/piece'
 

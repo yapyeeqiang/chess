@@ -241,27 +241,17 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
 
     const moveGenerators: Record<string, () => BoardPosition[]> = {
       knight: () =>
-        getKnightLegalMoves(
-          board,
-          activePiece,
-          enPassantTarget,
-          castlingRights
-        ),
+        getKnightLegalMoves(board, activePiece, enPassantTarget),
       bishop: () =>
-        getBishopLegalMoves(
-          board,
-          activePiece,
-          enPassantTarget,
-          castlingRights
-        ),
+        getBishopLegalMoves(board, activePiece, enPassantTarget),
       rook: () =>
-        getRookLegalMoves(board, activePiece, enPassantTarget, castlingRights),
+        getRookLegalMoves(board, activePiece, enPassantTarget),
       queen: () =>
-        getQueenLegalMoves(board, activePiece, enPassantTarget, castlingRights),
+        getQueenLegalMoves(board, activePiece, enPassantTarget),
       king: () =>
         getKingLegalMoves(board, activePiece, enPassantTarget, castlingRights),
       pawn: () =>
-        getPawnLegalMoves(board, activePiece, enPassantTarget, castlingRights),
+        getPawnLegalMoves(board, activePiece, enPassantTarget),
     }
 
     const generator = moveGenerators[activePiece.name]
