@@ -1,63 +1,62 @@
-♟️ Chess Game
+# ♟️ Chess Game
 A simple yet functional chess game built from scratch.
 This project focuses on the core mechanics of chess while keeping the codebase lightweight and easy to expand.
 
-✨ Features
-Chessboard Rendering: Fully responsive, interactive chessboard.
+![Chess Demo](https://github.com/user-attachments/assets/af4c436d-09c7-4daa-99f6-64de08f53141)
 
-Coordinates Display: Ranks (1–8) and files (a–h) are shown clearly.
 
-Legal Piece Movement: All pieces can move and capture following standard chess rules.
+## ✨ Features
+1. **Chessboard Rendering**: Fully responsive, interactive chessboard.
 
-Square Highlighting: Selected piece's square is highlighted for better UX.
+2. **Coordinates Display**: Ranks (1–8) and files (a–h) are shown clearly.
 
-Hint Squares: After selecting a piece, all possible legal move squares are visually hinted.
+3. **Legal Piece Movement**: All pieces can move and capture following standard chess rules. (Including castling, and en passant!)
 
-FEN Loading: Load any game position instantly using a valid FEN (Forsyth–Edwards Notation) string.
+4. **Square Highlighting**: Selected piece's square is highlighted for better UX.
 
-Move Validation: Movement respects chess rules such as piece-specific movement, captures, and blocking by other pieces.
+5. **Hint Squares**: After selecting a piece, all possible legal move squares are visually hinted.
+
+6. **FEN Loading**: Load any game position instantly using a valid FEN (Forsyth–Edwards Notation) string.
 
 (More minor improvements may exist that reflect attention to detail and user experience.)
 
-🚧 Upcoming Features (TODOs)
-Check and Checkmate Detection: Warn or end the game when a king is in check or checkmated.
+## 🚧 Upcoming Features (TODOs)
+1. **Check and Checkmate Detection**: Warn or end the game when a king is in check or checkmated.
 
-Stalemate and Draw Handling: Detect stalemates, threefold repetitions, insufficient material, etc.
+2. **Stalemate and Draw Handling**: Detect stalemates, threefold repetitions, insufficient material, etc.
 
-Castling: Implement short and long castling rules.
+3. **Pawn Promotion**: Allow pawns to promote when reaching the final rank.
 
-En Passant: Add support for the special en passant capture move.
+4. **Move History**: Keep track of all moves made during the game.
 
-Pawn Promotion: Allow pawns to promote when reaching the final rank.
+5. **Undo/Redo Moves**: Support undoing and redoing moves.
 
-Move History: Keep track of all moves made during the game.
+6. **Basic AI Opponent**: Play against a simple computer opponent.
 
-Undo/Redo Moves: Support undoing and redoing moves.
+7. **Multiplayer Support**: Play against another human on the same device or over a network.
 
-Basic AI Opponent: (Optional) Play against a simple computer opponent.
+8. **UI/UX Improvements**: Animations, better highlighting, sound effects, and piece dragging.
 
-Multiplayer Support: Play against another human on the same device or over a network.
+9. **Saving & Loading Games**: Save game progress locally or via cloud.
 
-UI/UX Improvements: Animations, better highlighting, sound effects, and piece dragging.
+10. **Analysis Mode**: View all legal moves from any position without playing.
 
-Saving & Loading Games: Save game progress locally or via cloud.
-
-Analysis Mode: View all legal moves from any position without playing.
-
-📦 Installation
-bash
-Copy
-Edit
-git clone https://github.com/your-username/your-chess-repo.git
-cd your-chess-repo
+## 📦 Installation
+```bash
+git clone https://github.com/yapyeeqiang/chess.git
+cd chess
 npm install   # or yarn
 npm run dev   # or yarn dev
-🛠️ Built With
-[Your stack here, e.g., React / TypeScript / JavaScript / HTML5 Canvas]
+```
 
-🤝 Contributions
+## 🛠️ Built With
+- Next.js (App Router)
+- TypeScript
+- TailwindCSS
+
+## 🤝 Contributions
 Contributions, suggestions, and issues are welcome!
 Please fork the repository and open a pull request or issue if you have something to add or fix.
 
-📜 License
+## 📜 License
 This project is licensed under the MIT License.
