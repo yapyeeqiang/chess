@@ -1,4 +1,4 @@
-# ♟️ Chess Game
+# ♟️ GoChess
 A simple yet functional chess game built from scratch.
 This project focuses on the core mechanics of chess while keeping the codebase lightweight and easy to expand.
 
